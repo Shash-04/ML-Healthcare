@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter,Geist,Geist_Mono } from "next/font/google";
 import AuthProvider from "@/context/AuthProvider";
 import "./globals.css";
 import type React from "react";
 
-const inter = Inter({ subsets: ["latin"] });
 
 const inter = Inter({ subsets: ["latin"] });
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist" });
