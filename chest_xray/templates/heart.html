@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardiovascular Disease Prediction</title>
+</head>
+<body>
+    <h2>Enter Your Health Details</h2>
+    <form method="POST">
+        <label>Gender (0 or 1):</label>
+        <input type="text" name="gender" required><br>
+
+        <label>Height (cm):</label>
+        <input type="text" name="height" required><br>
+
+        <label>Weight (kg):</label>
+        <input type="text" name="weight" required><br>
+
+        <label>BP High:</label>
+        <input type="text" name="ap_hi" required><br>
+
+        <label>BP Low:</label>
+        <input type="text" name="ap_lo" required><br>
+
+        <label>Cholesterol Level:</label>
+        <input type="text" name="cholesterol" required><br>
+
+        <label>Glucose Level:</label>
+        <input type="text" name="gluc" required><br>
+
+        <label>Smoker (0 or 1):</label>
+        <input type="text" name="smoke" required><br>
+
+        <label>Alcohol Consumption (0 or 1):</label>
+        <input type="text" name="alco" required><br>
+
+        <label>Physical Activity (0 or 1):</label>
+        <input type="text" name="active" required><br>
+
+        <label>Age (Years):</label>
+        <input type="text" name="age_years" required><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    {% if prediction is not none %}
+        <h3>Prediction: {{ result }} ({{ prediction }})</h3>
+    {% endif %}
+</body>
+</html>
