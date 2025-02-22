@@ -3,48 +3,53 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Activity, FileText, Heart, History, MessageSquare, Settings, User } from "lucide-react"
+import { Activity, FileText, Heart, History, MessageSquare, Settings, User, CircleGauge } from "lucide-react"
 
 const routes = [
   {
     label: "Overview",
     icon: Activity,
-    href: "/dashboard",
+    href: "/dashboards/overview",
     color: "text-sky-500",
   },
   {
     label: "Health Data",
     icon: Heart,
-    href: "/dashboard/health-data",
+    href: "/dashboards/health-data",
     color: "text-pink-700",
   },
   {
     label: "Predictions",
     icon: FileText,
-    href: "/dashboard/predictions",
+    href: "/dashboards/predictions",
     color: "text-violet-500",
   },
   {
     label: "Consultation",
     icon: MessageSquare,
-    href: "/dashboard/consultation",
+    href: "/dashboards/consultation",
     color: "text-green-700",
   },
   {
     label: "History",
     icon: History,
-    href: "/dashboard/history",
+    href: "/dashboards/history",
     color: "text-orange-700",
   },
   {
     label: "Profile",
     icon: User,
-    href: "/dashboard/profile",
+    href: "/dashboards/profile",
   },
   {
     label: "Settings",
     icon: Settings,
-    href: "/dashboard/settings",
+    href: "/dashboards/settings",
+  },
+  {
+    label: "Dashboard",
+    icon: CircleGauge,
+    href: "/dashboards",
   },
 ]
 

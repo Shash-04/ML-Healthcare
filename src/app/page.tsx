@@ -1,10 +1,13 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Activity, Brain, Heart, Shield } from "lucide-react"
+import Footer from "@/components/ui/Footer"
+import Navbar from "@/components/ui/navbar"
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
+      <Navbar/>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 md:px-6">
@@ -64,6 +67,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <Footer/>
     </div>
   )
 }
