@@ -19,12 +19,11 @@ export async function GET(req: NextRequest) {
         };
 
         // Format for Server-Sent Events
-        const dataString = `data: ${JSON.stringify(healthData)}\n\n`;
+        const dataString = `data: ${JSON.stringify(healthData)}\n\n`; 
         controller.enqueue(encoder.encode(dataString));
       };
 
-      // Send the first response immediately
-      sendData();
+      // Send the first response immediately      sendData();
 
       // Stream data every minute (60000 ms)
       const interval = setInterval(sendData, 4500);
