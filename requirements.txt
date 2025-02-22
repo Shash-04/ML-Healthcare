@@ -1,0 +1,331 @@
+import numpy as np 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.io import arff
+from sklearn.model_selection import train_test_split
+import matplotlib
+import tensorflow as tf
+from tensorflow import data
+from tensorflow.keras.models import Model, Sequential
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.metrics import mae
+from tensorflow.keras import layers
+from tensorflow import keras
+from sklearn.metrics import accuracy_score, recall_score, precision_score, confusion_matrix, f1_score, classification_report, roc_curve, roc_auc_score
+import os
+
+# Configure GPU if available
+physical_devices = tf.config.list_physical_devices('GPU')
+if len(physical_devices) > 0:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
+
+# Create necessary directories
+os.makedirs('Models/data', exist_ok=True)
+os.makedirs('saved_models', exist_ok=True)
+os.makedirs('logs', exist_ok=True)
+
+# Set plotting parameters
+np.set_printoptions(suppress=True)
+matplotlib.rcParams["figure.figsize"] = (6, 4)
+plt.style.use("ggplot")
+
+# Load and prepare data
+try:
+    normal_df = pd.read_csv('Models/data/ptbdb_normal.csv').iloc[:, :-1]
+    anomaly_df = pd.read_csv('Models/data/ptbdb_abnormal.csv').iloc[:, :-1]
+except FileNotFoundError:
+    print("Error: Data files not found. Please ensure ptbdb_normal.csv and ptbdb_abnormal.csv are in the Models/data directory.")
+    raise
+
+print("Shape of Normal data", normal_df.shape)
+print("Shape of Abnormal data", anomaly_df.shape)
+
+
+def plot_sample(normal, anomaly):
+    index = np.random.randint(0, len(normal_df), 2)
+
+    fig, ax = plt.subplots(1, 2, sharey=True, figsize=(10, 4))
+    ax[0].plot(normal.iloc[index[0], :].values, label=f"Case {index[0]}")
+    ax[0].plot(normal.iloc[index[1], :].values, label=f"Case {index[1]}")
+    ax[0].legend(shadow=True, frameon=True, facecolor="inherit", loc=1, fontsize=9)
+    ax[0].set_title("Normal")
+
+    ax[1].plot(anomaly.iloc[index[0], :].values, label=f"Case {index[0]}")
+    ax[1].plot(anomaly.iloc[index[1], :].values, label=f"Case {index[1]}")
+    ax[1].legend(shadow=True, frameon=True, facecolor="inherit", loc=1, fontsize=9)
+    ax[1].set_title("Anomaly")
+
+    plt.tight_layout()
+    plt.show()
+
+# Convert to numpy and split data
+normal = normal_df.to_numpy()
+anomaly = anomaly_df.to_numpy()
+
+X_train, X_test = train_test_split(normal, test_size=0.15, random_state=45, shuffle=True)
+print(f"Train shape: {X_train.shape}, Test shape: {X_test.shape}, anomaly shape: {anomaly.shape}")
+
+# Normalize data
+X_train = X_train.astype('float32')
+X_test = X_test.astype('float32')
+anomaly = anomaly.astype('float32')
+
+X_train = (X_train - X_train.min()) / (X_train.max() - X_train.min())
+X_test = (X_test - X_test.min()) / (X_test.max() - X_test.min())
+anomaly = (anomaly - anomaly.min()) / (anomaly.max() - anomaly.min())
+
+# Set random seed
+tf.keras.utils.set_random_seed(1024)
+
+class AutoEncoder(Model):
+    def __init__(self, input_dim, latent_dim):
+        super(AutoEncoder, self).__init__()
+        self.input_dim = input_dim
+        self.latent_dim = latent_dim
+        
+        self.pad_size = int(np.ceil(input_dim/8) * 8 - input_dim)
+        
+        self.encoder = tf.keras.Sequential([
+            layers.Input(shape=(input_dim,)),
+            layers.Reshape((input_dim, 1, 1)),
+            layers.ZeroPadding2D(padding=((self.pad_size, 0), (0, 0))),  
+            layers.Conv2D(128, (3, 1), strides=1, activation='relu', padding="same"),
+            layers.BatchNormalization(),
+            layers.MaxPooling2D(pool_size=(2, 1), padding="same"),
+            layers.Conv2D(64, (3, 1), strides=1, activation='relu', padding="same"),
+            layers.BatchNormalization(),
+            layers.MaxPooling2D(pool_size=(2, 1), padding="same"),
+            layers.Conv2D(latent_dim, (3, 1), strides=1, activation='relu', padding="same"),
+            layers.BatchNormalization(),
+            layers.MaxPooling2D(pool_size=(2, 1), padding="same")
+        ])
+        
+        self.decoder = tf.keras.Sequential([
+            layers.Conv2DTranspose(latent_dim, (3, 1), strides=1, activation='relu', padding="same"),
+            layers.UpSampling2D(size=(2, 1)),
+            layers.BatchNormalization(),
+            layers.Conv2DTranspose(64, (3, 1), strides=1, activation='relu', padding="same"),
+            layers.UpSampling2D(size=(2, 1)),
+            layers.BatchNormalization(),
+            layers.Conv2DTranspose(128, (3, 1), strides=1, activation='relu', padding="same"),
+            layers.UpSampling2D(size=(2, 1)),
+            layers.BatchNormalization(),
+            layers.Conv2D(1, (3, 1), activation='linear', padding="same"),
+            layers.Lambda(lambda x: x[:, :input_dim, :, :]),  
+            layers.Reshape((input_dim,))
+        ])
+
+    def build(self, input_shape):
+        super(AutoEncoder, self).build(input_shape)
+        self.encoder.build(input_shape)
+        encoded_shape = self.encoder.compute_output_shape(input_shape)
+        self.decoder.build(encoded_shape)
+
+    def call(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+
+# Model parameters
+input_dim = X_train.shape[-1]
+latent_dim = 32
+
+# Create and compile model
+model = AutoEncoder(input_dim, latent_dim)
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss="mae")
+
+# Build model
+model.build((None, input_dim))
+model.summary()
+
+# Callbacks
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir='./logs',
+    histogram_freq=1,
+    write_graph=True
+)
+
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=10,
+    min_delta=1e-3,
+    mode='min',
+    restore_best_weights=True,
+    verbose=1
+)
+
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.2,
+    patience=5,
+    min_lr=1e-6,
+    verbose=1
+)
+
+# Training parameters
+epochs = 100
+batch_size = 128
+
+# Train the model
+history = model.fit(
+    X_train, 
+    X_train,
+    epochs=epochs,
+    batch_size=batch_size,
+    validation_split=0.1,
+    callbacks=[early_stopping, reduce_lr, tensorboard_callback],
+    verbose=1,
+    shuffle=True
+)
+
+# Save the model and training artifacts
+model_save_path = 'saved_models/autoencoder'
+model.save(f'{model_save_path}_full')
+model.save_weights(f'{model_save_path}_weights')
+tf.saved_model.save(model, f'{model_save_path}_savedmodel')
+
+# Save training history
+history_df = pd.DataFrame(history.history)
+history_df.to_csv(f'{model_save_path}_history.csv')
+
+# Plot training history
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.title('Model Loss During Training')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True)
+plt.savefig(f'{model_save_path}_training_history.png')
+plt.show()
+
+def predict(model, X):
+    pred = model.predict(X, verbose=0)
+    loss = mae(pred, X)
+    return pred, loss
+
+# Calculate losses and threshold
+_, train_loss = predict(model, X_train)
+_, test_loss = predict(model, X_test)
+_, anomaly_loss = predict(model, anomaly)
+threshold = np.mean(train_loss) + np.std(train_loss)
+
+# Save threshold
+np.save(f'{model_save_path}_threshold.npy', threshold)
+
+# Plot loss distributions
+bins = 40
+plt.figure(figsize=(9, 5), dpi=100)
+sns.histplot(np.clip(train_loss, 0, 0.5), bins=bins, kde=True, label="Train Normal")
+sns.histplot(np.clip(test_loss, 0, 0.5), bins=bins, kde=True, label="Test Normal")
+sns.histplot(np.clip(anomaly_loss, 0, 0.5), bins=bins, kde=True, label="Anomaly")
+
+ax = plt.gca()
+ylim = ax.get_ylim()
+plt.vlines(threshold, 0, ylim[-1], color="k", ls="--")
+plt.annotate(f"Threshold: {threshold:.3f}", xy=(threshold, ylim[-1]), 
+             xytext=(threshold+0.009, ylim[-1]),
+             arrowprops=dict(facecolor='black', shrink=0.05), 
+             fontsize=9)
+plt.legend(shadow=True, frameon=True, facecolor="inherit", loc="best", fontsize=9)
+plt.savefig(f'{model_save_path}_loss_distribution.png')
+plt.show()
+
+def plot_examples(model, data, ax, title):
+    pred, loss = predict(model, data)
+    ax.plot(data.flatten(), label="Actual")
+    ax.plot(pred[0], label="Predicted")
+    ax.fill_between(range(1, input_dim + 1), data.flatten(), pred[0], alpha=0.3, color="r")
+    ax.legend(shadow=True, frameon=True, facecolor="inherit", loc=1, fontsize=7)
+    ax.set_title(f"{title} (loss: {loss[0]:.3f})", fontsize=9.5)
+
+# Plot sample reconstructions
+fig, axes = plt.subplots(2, 5, sharey=True, sharex=True, figsize=(12, 6), facecolor="w")
+random_indexes = np.random.randint(0, len(X_train), size=5)
+
+for i, idx in enumerate(random_indexes):
+    data = X_train[[idx]]
+    plot_examples(model, data, ax=axes[0, i], title="Normal")
+
+for i, idx in enumerate(random_indexes):
+    data = anomaly[[idx]]
+    plot_examples(model, data, ax=axes[1, i], title="Anomaly")
+
+plt.tight_layout()
+fig.suptitle("Sample plots (Actual vs Reconstructed by the CNN autoencoder)", y=1.04, weight="bold")
+plt.savefig(f'{model_save_path}_reconstructions.png')
+plt.show()
+
+def prepare_labels(model, train, test, anomaly, threshold):
+    ytrue = np.concatenate((np.ones(len(train)+len(test), dtype=int), 
+                          np.zeros(len(anomaly), dtype=int)))
+    
+    _, train_loss = predict(model, train)
+    _, test_loss = predict(model, test)
+    _, anomaly_loss = predict(model, anomaly)
+    
+    train_pred = (train_loss <= threshold).numpy().astype(int)
+    test_pred = (test_loss <= threshold).numpy().astype(int)
+    anomaly_pred = (anomaly_loss <= threshold).numpy().astype(int)
+    
+    ypred = np.concatenate((train_pred, test_pred, anomaly_pred))
+    return ytrue, ypred
+
+# Calculate and plot metrics
+ytrue, ypred = prepare_labels(model, X_train, X_test, anomaly, threshold)
+
+# Print and save classification report
+print("\nClassification Report:")
+report = classification_report(ytrue, ypred, target_names=["Anomaly", "Normal"])
+print(report)
+with open(f'{model_save_path}_classification_report.txt', 'w') as f:
+    f.write(report)
+
+# Plot and save confusion matrix and ROC curve
+plt.figure(figsize=(14, 6))
+
+# Confusion Matrix
+plt.subplot(1, 2, 1)
+cm = confusion_matrix(ytrue, ypred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues')
+plt.title('Confusion Matrix')
+plt.ylabel('True Label')
+plt.xlabel('Predicted Label')
+
+# ROC Curve
+plt.subplot(1, 2, 2)
+fpr, tpr, _ = roc_curve(ytrue, ypred)
+auc = roc_auc_score(ytrue, ypred)
+plt.plot(fpr, tpr, label=f'ROC curve (AUC = {auc:.2f})')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend(loc="lower right")
+
+plt.tight_layout()
+plt.savefig(f'{model_save_path}_metrics.png')
+plt.show()
+
+print("\nModel and artifacts saved successfully!")
+print(f"Model saved at: {model_save_path}_full")
+print(f"Weights saved at: {model_save_path}_weights")
+print(f"SavedModel format at: {model_save_path}_savedmodel")
+print(f"Training history saved at: {model_save_path}_history.csv")
+print(f"Threshold value saved at: {model_save_path}_threshold.npy")
+
+# Function to load the saved model and artifacts
+def load_saved_model(model_path='saved_models/autoencoder'):
+    """
+    Load the saved model and its associated artifacts
+    """
+    loaded_model = tf.keras.models.load_model(f'{model_path}_full')
+    loaded_threshold = np.load(f'{model_path}_threshold.npy')
+    loaded_history = pd.read_csv(f'{model_path}_history.csv')
+    return loaded_model, loaded_threshold, loaded_history
+
+loaded_model, loaded_threshold, loaded_history = load_saved_model()
