@@ -34,12 +34,12 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section className='w-full py-12 md:py-24 lg:py-32 bg-gray-100'>
-          <div className='container px-4 md:px-6'>
-            <div className='grid gap-6 lg:grid-cols-4 md:grid-cols-2'>
-              <div className='flex flex-col items-center space-y-4'>
-                <div className='p-4 bg-primary rounded-full'>
-                  <Heart className='w-6 h-6 text-white' />
+        <section className="w-full py-12 md:py-24 lg:py-32 ">
+          <div className="container px-4 md:px-6">
+            <div className="grid gap-6 lg:grid-cols-4 md:grid-cols-2">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="p-4 bg-primary rounded-full">
+                  <Heart className="w-6 h-6 text-white" />
                 </div>
                 <h3 className='text-xl font-bold'>Health Monitoring</h3>
                 <p className='text-center text-gray-500'>
