@@ -4,6 +4,7 @@ import AuthProvider from "@/context/AuthProvider";
 import "./globals.css";
 import type React from "react";
 
+const inter = Inter({ subsets: ["latin"] });
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
