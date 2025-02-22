@@ -1,9 +1,10 @@
 import React from 'react'
+import HealthForm from './HealthForm'
 
 function page() {
   return (
     <div>
-      prediction
+      <HealthForm />
     </div>
   )
 }
