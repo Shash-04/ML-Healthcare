@@ -17,9 +17,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      <AuthProvider>
       <body className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        {children}
       </body>
+      </AuthProvider>
     </html>
   );
 }
