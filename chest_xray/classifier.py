@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 import cv2
-import os
 
 # Load the model once to avoid reloading on every request
 model = tf.keras.models.load_model('model_wts.keras', compile=False)
@@ -21,7 +20,7 @@ def classify_image(image_path):
         image_path (str): Path to the uploaded image.
     
     Returns:
-        list: Top 3 predicted labels with probabilities.
+        list: Top 3 predicted labels with probabilities as percentages (rounded to 2 decimal places).
     """
     
     # Load and preprocess the image
@@ -35,7 +34,7 @@ def classify_image(image_path):
     predictions = model.predict(img)[0]
     
     # Convert predictions to a sorted dictionary (descending order)
-    results = {labels[i]: float(predictions[i]) for i in range(len(labels))}
+    results = {labels[i]: round(float(predictions[i]) * 100, 2) for i in range(len(labels))}  # Multiply by 100 & round to 2 decimals
     sorted_results = sorted(results.items(), key=lambda item: item[1], reverse=True)
     
     # Return top 3 predictions
