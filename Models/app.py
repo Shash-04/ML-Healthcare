@@ -1,48 +1,34 @@
 from flask import Flask, request, jsonify
-import torch
-import torch.nn as nn
-import numpy as np
-from model import AutoEncoder  # Import model class
+import os
 
 app = Flask(__name__)
 
-# Load trained PyTorch model (DO NOT retrain)
-input_dim = 187  # Adjust based on your dataset
-model = AutoEncoder(input_dim)
-model.load_state_dict(torch.load('autoencoder_model.pth'))
-model.eval()
+UPLOAD_FOLDER = 'static/uploads'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Function to preprocess input
-def preprocess(data):
-    data = np.array(data, dtype=np.float32)
-    data = (data - np.min(data)) / (np.max(data) - np.min(data))
-    return torch.tensor(data).unsqueeze(0).unsqueeze(0)  # Reshape for model
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Predict function
-def predict_anomaly(data):
-    with torch.no_grad():
-        reconstructed = model(data)
-    loss = torch.mean(torch.abs(data - reconstructed))
-    return loss.item()
+@app.route("/", methods=["POST"])
+def upload_file():
+    if "file" not in request.files:
+        response = jsonify({"error": "No file part"}), 400
+        print(response)  # Print response in the terminal
+        return response
 
-# Define anomaly threshold
-THRESHOLD = 0.05
+    file = request.files["file"]
 
-@app.route('/')
-def home():
-    return jsonify({"message": "Welcome to the ECG Anomaly Detection API"}), 200
+    if file.filename == "":
+        response = jsonify({"error": "No selected file"}), 400
+        print(response)  # Print response in the terminal
+        return response
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    req = request.get_json()
-    if 'ecg_data' not in req:
-        return jsonify({'error': 'Missing ECG data'}), 400
+    file_path = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+    file.save(file_path)
 
-    ecg_data = preprocess(req['ecg_data'])
-    loss = predict_anomaly(ecg_data)
-    is_anomaly = loss > THRESHOLD
+    # Dummy response - replace with actual image classification logic
+    response = jsonify({"message": "File uploaded successfully", "file_path": file_path})
+    print(response)  # Print response in the terminal
+    return response
 
-    return jsonify({'loss': float(loss), 'anomaly_detected': bool(is_anomaly)})
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
