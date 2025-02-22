@@ -1,5 +1,8 @@
 /venv
 /Models/data
+/chest_xray/model_wts.keras
+
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies

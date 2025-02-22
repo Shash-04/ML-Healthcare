@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chest X-ray Classifier</title>
+</head>
+<body>
+    <h2>Upload Chest X-ray Image</h2>
+    
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <button type="submit">Upload & Classify</button>
+    </form>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    {% if image_path %}
+        <h3>Uploaded Image:</h3>
+        <img src="{{ image_path }}" alt="Uploaded Image" width="300">
+        
+        <h3>Top 3 Predictions:</h3>
+        <ul>
+            {% for label, probability in predictions %}
+                <li><strong>{{ label }}:</strong> {{ probability|round(4) }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
