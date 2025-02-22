@@ -1,9 +1,11 @@
+"use client"
 import React from 'react'
+import ConsultationPage from './ConsultationPage'
 
 function page() {
   return (
     <div>
-      consultation
+      <ConsultationPage />
     </div>
   )
 }

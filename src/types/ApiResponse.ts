@@ -1,4 +1,4 @@
-import {Report} from '@/models/User'
+import Report from '@/models/User'
 
 export interface ApiResponse {
   success: boolean;

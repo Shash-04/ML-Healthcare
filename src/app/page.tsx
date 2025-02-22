@@ -24,10 +24,10 @@ export default function Home() {
               </div>
               <div className='space-x-4'>
                 <Button asChild size='lg'>
-                  <Link href='/signup'>Get Started</Link>
+                  <Link href='/sign-up'>Get Started</Link>
                 </Button>
-                <Button variant='outline' size='lg' asChild>
-                  <Link href='/login'>Sign In</Link>
+                <Button variant="outline" size="lg" asChild>
+                  <Link href="/sign-in">Sign In</Link>
                 </Button>
               </div>
             </div>
