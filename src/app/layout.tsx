@@ -5,7 +5,6 @@ import "./globals.css";
 import type React from "react";
 
 
-const inter = Inter({ subsets: ["latin"] });
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
@@ -18,7 +17,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark"><AuthProvider>
+    <html lang="en" className="dark">
+      <AuthProvider>
       <body className={`${geistSans.variable} ${geistMono.variable} ${inter.className} antialiased`}>
         {children}
       </body>
