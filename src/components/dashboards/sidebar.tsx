@@ -66,7 +66,7 @@ export default function Sidebar() {
               href={route.href}
               className={cn(
                 "text-sm group flex p-3 w-full justify-start font-medium cursor-pointer hover:text-primary hover:bg-gray-100/50 rounded-lg transition",
-                pathname === route.href ? "text-primary bg-gray-100" : "text-muted-foreground",
+                pathname === route.href ? "text-primary " : "text-muted-foreground",
               )}
             >
               <div className="flex items-center flex-1">

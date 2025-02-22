@@ -33,7 +33,7 @@ export default function RealTimeHealth() {
   }, []);
 
   return (
-    <div className='p-4 bg-gray-100 rounded-lg shadow-lg text-center'>
+    <div className='p-4  rounded-lg shadow-lg text-center'>
       <h2 className='text-xl font-bold'>📡 Real-Time Health Data</h2>
       {data ? (
         <>

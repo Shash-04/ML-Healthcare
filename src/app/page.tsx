@@ -3,12 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Activity, Brain, Heart, Shield } from 'lucide-react';
 import Footer from '@/components/ui/Footer';
 import Navbar from '@/components/ui/navbar';
-import RealTimeHealth from '@/components/Real-time-data/RealTimeHealth';
+
 
 export default function Home() {
   return (
     <div className='flex flex-col min-h-screen'>
-      <RealTimeHealth />
       <Navbar />
       <main className='flex-1'>
         <section className='w-full py-12 md:py-24 lg:py-32 xl:py-48'>
