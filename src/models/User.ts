@@ -32,7 +32,6 @@ export interface User extends Document{
     verifyCode:string;
     verifyCodeExpiry:Date;
     isverified:boolean;
-    isAcceptingMessage:boolean;
     report:Report[]
 }
 const userSchema :Schema<User> = new Schema({
@@ -63,10 +62,7 @@ const userSchema :Schema<User> = new Schema({
         required:true,
         
     },
-    isAcceptingMessage:{
-     type: Boolean,
-        required:true
-    },
+    
     report:[reportSchema]
 
 })
