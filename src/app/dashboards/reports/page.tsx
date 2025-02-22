@@ -1,9 +1,10 @@
 import React from 'react'
+import PatientOverview from './PatientOverview'
 
 function page() {
   return (
     <div>
-      Settings
+      <PatientOverview />
     </div>
   )
 }
