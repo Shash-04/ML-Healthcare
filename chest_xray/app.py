@@ -5,7 +5,7 @@ import tensorflow as tf
 import joblib
 from classifier import classify_image
 
-app = Flask(__name__)
+app = Flask(_name_)
 
 # Upload folder for image classification
 UPLOAD_FOLDER = 'static/uploads'
@@ -69,5 +69,7 @@ def predict():
     
     return jsonify({"prediction": prediction, "result": result})
 
+
 if __name__ == "__main__":
     app.run(debug=True)
+

@@ -3,9 +3,14 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Activity, FileText, Heart, History, MessageSquare, Settings, User, CircleGauge } from "lucide-react"
+import { Activity, FileText, Heart, History, MessageSquare, Settings, User, CircleGauge, Book } from "lucide-react"
 
 const routes = [
+  {
+    label: "Profile",
+    icon: User,
+    href: "/dashboards/profile",
+  },
   {
     label: "Overview",
     icon: Activity,
@@ -36,15 +41,11 @@ const routes = [
     href: "/dashboards/history",
     color: "text-orange-700",
   },
+  
   {
-    label: "Profile",
-    icon: User,
-    href: "/dashboards/profile",
-  },
-  {
-    label: "Settings",
-    icon: Settings,
-    href: "/dashboards/settings",
+    label: "Reports",
+    icon: Book,
+    href: "/dashboards/reports",
   },
   {
     label: "Dashboard",
