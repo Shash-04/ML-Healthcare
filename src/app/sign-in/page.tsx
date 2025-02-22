@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -29,7 +28,7 @@ export default function SignInPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+      <div className="w-full max-w-md p-6 bg-white text-black rounded-lg shadow-md">
         <h2 className="text-2xl font-semibold text-center">Sign In</h2>
         {error && <p className="text-red-500 text-center mt-2">{error}</p>}
         <form onSubmit={handleSubmit} className="mt-4">
