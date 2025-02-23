@@ -1,19 +1,32 @@
-
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+// Ensure this points to your NextAuth config
 import cloudinary from '@/lib/cloudinary';
 import dbConnect from '@/lib/dbConnect';
 import UserModel from '@/models/User';
 import { Readable } from 'stream';
+import { authOptions } from '../auth/[...nextauth]/option';
 
 export async function POST(req: NextRequest) {
   try {
-    // Connect to database using your implementation
+    // Get session
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized. Please log in.' },
+        { status: 401 }
+      );
+    }
+
+    const userId = session.user.id; // Get user ID from session
+    console.log("Authenticated user ID:", userId);
+
+    // Connect to database
     await dbConnect();
     console.log("Database connection established");
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const userId = formData.get('userId') as string;
 
     if (!file) {
       return NextResponse.json(
@@ -32,7 +45,7 @@ export async function POST(req: NextRequest) {
     // Validate file type
     if (!file.type.match(/^(image\/(jpeg|png|jpg)|application\/pdf)$/)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPG, PNG and PDF files are allowed' },
+        { error: 'Invalid file type. Only JPG, PNG, and PDF files are allowed' },
         { status: 400 }
       );
     }
@@ -49,7 +62,7 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Upload to Cloudinary with more detailed options
+    // Upload to Cloudinary
     const uploadPromise = new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
