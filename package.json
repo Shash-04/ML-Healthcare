@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@langchain/google-genai": "^0.1.8",
     "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.2",
     "@react-email/components": "^0.0.33",
@@ -17,6 +18,8 @@
     "cloudinary": "^1.41.3",
     "clsx": "^2.1.1",
     "formidable": "^3.5.2",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "lucide": "^0.475.0",
     "lucide-react": "^0.475.0",
     "mongodb": "^6.13.1",
@@ -29,7 +32,6 @@
     "next-connect": "^1.0.0",
     "next-themes": "^0.4.4",
     "radix-ui": "^1.1.3",
-
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",

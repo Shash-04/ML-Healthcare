@@ -1,11 +1,10 @@
 import React from 'react'
-import PatientOverview from '../reports/PatientOverview'
-
+import HealthcareChat from './HealthcareChat'
 
 function page() {
   return (
     <div>
-      Overview
+      <HealthcareChat />
     </div>
   )
 }

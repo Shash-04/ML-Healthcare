@@ -3,19 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Activity, FileText, Heart, History, MessageSquare, Settings, User, CircleGauge, Book } from "lucide-react"
+import { Activity, FileText, Heart, History, MessageSquare, Settings, User, CircleGauge, Book, Upload, Bot } from "lucide-react"
 
 const routes = [
   {
     label: "Profile",
     icon: User,
     href: "/dashboards/profile",
-  },
-  {
-    label: "Overview",
-    icon: Activity,
-    href: "/dashboards/overview",
-    color: "text-sky-500",
   },
   {
     label: "Health Data",
@@ -41,7 +35,13 @@ const routes = [
     href: "/dashboards/history",
     color: "text-orange-700",
   },
-  
+  {
+    label: "Upload",
+    icon: Upload,
+    href: "/dashboards/upload",
+    color: "text-orange-700",
+  },
+
   {
     label: "Reports",
     icon: Book,
@@ -51,6 +51,11 @@ const routes = [
     label: "Dashboard",
     icon: CircleGauge,
     href: "/dashboards",
+  },
+  {
+    label: "Chatbot",
+    icon: Bot,
+    href: "/dashboards/chat",
   },
 ]
 

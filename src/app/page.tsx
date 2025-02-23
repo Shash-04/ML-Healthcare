@@ -81,11 +81,11 @@ export default function LandingPage() {
                 <AnimatedGradientBorder>
                   <Button
                     asChild
-                    className='w-full sm:w-auto from-neutral-300 text-lg py-6 px-8 bg-transparent hover:bg-gray-800/50'
+                    className='w-full sm:w-auto from-neutral-300 text-lg text-black py-6 px-8 bg-whitehover:bg-gray-800/50'
                   >
                     <Link href='/sign-up'>
                       Get Started
-                      <ChevronRight className='ml-2 h-5 w-5' />
+                      {/* <ChevronRight className='ml-2 h-5 w-5' /> */}
                     </Link>
                   </Button>
                 </AnimatedGradientBorder>

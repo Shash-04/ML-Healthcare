@@ -10,7 +10,7 @@ export async function sendVerificationEmail(
   verifyCode: string
 ): Promise<ApiResponse> {
   try {
-   const response = await resend.emails.send({
+    const response = await resend.emails.send({
       from: 'ankurdeepmlproject.lovestoblog.com',
       to: email,
       subject: 'Mystery Message Verification Code',

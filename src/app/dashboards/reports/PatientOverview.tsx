@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, FileText, Beaker, Droplets,FlaskConical } from 'lucide-react';
+import { Activity, FileText, Beaker, Droplets, FlaskConical } from 'lucide-react';
+import ExportPDFButton from '@/components/ExportPDFButton'
 
-// TypeScript interfaces
+
 interface BloodReport {
   parameter: string;
   value: number | string;
@@ -39,7 +40,7 @@ interface PatientData {
 }
 
 // Dummy data
-const patientData: PatientData = {
+const patientData: PatientData ={
   id: "P12345",
   name: "Jane Smith",
   bloodReports: [
@@ -136,6 +137,11 @@ const PatientOverview = () => {
           <h1 className="text-3xl font-bold text-gray-100">{patientData.name}</h1>
           <p className="text-gray-400">ID: {patientData.id}</p>
         </div>
+        <div> <ExportPDFButton
+          data={patientData}
+          fileName="user-data"
+          title="User Data Report"
+        /></div>
       </div>
 
       {/* Blood Report */}
