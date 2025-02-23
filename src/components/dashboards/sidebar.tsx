@@ -12,12 +12,6 @@ const routes = [
     href: "/dashboards/profile",
   },
   {
-    label: "Overview",
-    icon: Activity,
-    href: "/dashboards/overview",
-    color: "text-sky-500",
-  },
-  {
     label: "Health Data",
     icon: Heart,
     href: "/dashboards/health-data",
