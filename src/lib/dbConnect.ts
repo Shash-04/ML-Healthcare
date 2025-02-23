@@ -9,7 +9,7 @@ async function dbConnect():Promise<void> {
         return
     }
 try {
-    const db= await mongoose.connect(process.env.MONGOODB_URI||"",{})
+    const db= await mongoose.connect("mongodb+srv://ankurdeep08102004:ankur123456789@testing.ztgon.mongodb.net")
     connection.isConnected =db.connections[0].readyState
     console.log("DB connected successfully")
 } catch (error) {

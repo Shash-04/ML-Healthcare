@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       // Send the first response immediately      sendData();
 
       // Stream data every minute (60000 ms)
-      const interval = setInterval(sendData, 3000);
+      const interval = setInterval(sendData, 2500);
 
       // Cleanup function when client disconnects
       controller.close = () => clearInterval(interval);

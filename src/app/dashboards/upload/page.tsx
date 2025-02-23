@@ -4,6 +4,7 @@ import { useState, useCallback } from "react"
 import { Upload, X, Image as ImageIcon } from "lucide-react"
 import { toast, Toaster } from 'sonner'
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
     Select,
     SelectContent,
@@ -22,12 +23,13 @@ interface FileUploadProps {
 export default function FileUpload({
     onUpload,
     maxSizeMB = 5,
-    allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml']
+    allowedTypes = ['image/jpg', 'image/png', 'image/gif', 'image/svg+xml']
 }: FileUploadProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null)
     const [previewUrl, setPreviewUrl] = useState<string | null>(null)
     const [imageType, setImageType] = useState<string>("")
     const [isUploading, setIsUploading] = useState(false)
+    const [predictions, setPredictions] = useState<[string, number][]>([]) // State for predictions
 
     // Cleanup function for the preview URL
     const cleanupPreview = useCallback(() => {
@@ -41,7 +43,7 @@ export default function FileUpload({
             return 'Please upload a valid image file (JPEG, PNG, GIF, or SVG).'
         }
         if (file.size > maxSizeMB * 1024 * 1024) {
-            return `Please upload an image smaller than ${maxSizeMB}MB.`
+            return "Please upload an image smaller than ${maxSizeMB}MB."
         }
         return null
     }
@@ -104,15 +106,16 @@ export default function FileUpload({
                 throw new Error('Upload failed')
             }
 
-            await response.json()
+            const data = await response.json()
+
+            // Store predictions in state
+            setPredictions(data.predictions || [])
 
             // Call the onUpload callback if provided
             if (onUpload) {
                 await onUpload(selectedFile, imageType)
             }
 
-            // Clear the form
-            handleClear()
             toast.success('Image uploaded successfully')
         } catch (error) {
             toast.error('Failed to upload image', {
@@ -128,6 +131,7 @@ export default function FileUpload({
         setSelectedFile(null)
         setPreviewUrl(null)
         setImageType("")
+        setPredictions([]) // Clear predictions
     }, [cleanupPreview])
 
     // Cleanup on unmount
@@ -139,11 +143,7 @@ export default function FileUpload({
 
     return (
         <div className="w-full max-w-md mx-auto space-y-6">
-            <Toaster
-                position="top-center"
-                expand={false}
-                richColors
-            />
+            <Toaster position="top-center" expand={false} richColors />
 
             <div className="space-y-2">
                 <h2 className="text-2xl font-bold text-center">Medical Image Upload</h2>
@@ -209,23 +209,29 @@ export default function FileUpload({
                 )}
             </div>
 
-            <Button
-                onClick={handleUpload}
-                className="w-full"
-                disabled={!selectedFile || !imageType || isUploading}
-            >
-                {isUploading ? (
-                    <div className="flex items-center gap-2">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-background border-t-foreground" />
-                        <span>Uploading...</span>
-                    </div>
-                ) : (
-                    <>
-                        <Upload className="mr-2 h-4 w-4" />
-                        Upload Image
-                    </>
-                )}
+            <Button onClick={handleUpload} className="w-full" disabled={!selectedFile || !imageType || isUploading}>
+                {isUploading ? "Uploading..." : "Upload Image"}
             </Button>
+
+            {predictions.length > 0 && <PredictionResults predictions={predictions} />}
         </div>
     )
 }
+
+const PredictionResults = ({ predictions }: { predictions: [string, number][] }) => (
+    <Card className="w-full">
+        <CardHeader>
+            <CardTitle>Predictions</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <ul className="space-y-2">
+                {predictions.map(([label, confidence], index) => (
+                    <li key={index} className="flex justify-between text-sm">
+                        <span>{label}</span>
+                        <span className="font-semibold">{confidence.toFixed(2)}%</span>
+                    </li>
+                ))}
+            </ul>
+        </CardContent>
+    </Card>
+)
