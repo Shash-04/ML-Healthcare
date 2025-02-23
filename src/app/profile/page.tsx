@@ -1,5 +1,3 @@
-
-'use client'
 import { useEffect, useState } from "react";
 import UserProfile from "@/components/UserProfile";
 
@@ -35,4 +33,3 @@ export default function ProfilePage() {
   if (!user) return <div>Loading...</div>;
   return <UserProfile user={user} />;
 }
-

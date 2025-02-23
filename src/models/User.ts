@@ -34,6 +34,7 @@ export interface HealthReport extends Document {
   healthMetrics: HealthMetric;
   labReports: LabReport[]; // Array to store multiple lab report images
   createdAt: Date;
+  updatedAt: Date;
 }
 
 const healthReportSchema: Schema<HealthReport> = new Schema({
@@ -55,6 +56,7 @@ const healthReportSchema: Schema<HealthReport> = new Schema({
     },
   ],
   createdAt: { type: Date, default: Date.now, required: true },
+  updatedAt: { type: Date, default: Date.now, required: true },
 });
 
 export interface User extends Document {
@@ -64,6 +66,13 @@ export interface User extends Document {
   verifyCode: string;
   verifyCodeExpiry: Date;
   isverified: boolean;
+  age: number;
+  gender: string;
+  height: string;
+  weight: string;
+  smokingStatus: string;
+  regularExercise: boolean;
+  alcoholStatus: string;
   healthReports: HealthReport[];
 }
 
@@ -74,8 +83,15 @@ const userSchema: Schema<User> = new Schema({
   verifyCode: { type: String, required: true },
   isverified: { type: Boolean, required: true, default: false },
   verifyCodeExpiry: { type: Date, required: true },
+  age: { type: Number, required: true },
+  gender: { type: String, required: true },
+  height: { type: String, required: true },
+  weight: { type: String, required: true },
+  smokingStatus: { type: String, required: true },
+  regularExercise: { type: Boolean, required: true },
+  alcoholStatus: { type: String, required: true },
   healthReports: [healthReportSchema], // Array of health reports with lab report images
-});
+}, { timestamps: true });
 
 const UserModel =
   mongoose.models.User || mongoose.model<User>("User", userSchema);
