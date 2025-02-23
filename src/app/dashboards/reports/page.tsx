@@ -1,5 +1,6 @@
 import React from 'react'
 import PatientOverview from './PatientOverview'
+import ExportPDFButton from '@/components/ExportPDFButton'
 
 function page() {
   return (
